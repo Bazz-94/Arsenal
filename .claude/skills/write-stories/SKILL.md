@@ -25,8 +25,8 @@ Writes stories from feature context provided by the user.
 ``` md
 # Story: Reset Forgotten Password
 
-## Dependencies
-- sa-00-title
+- Status: not started | in progress | completed
+- Dependency: sa-00-title
 
 ## Description
 Users can reset their password if they forget it.
