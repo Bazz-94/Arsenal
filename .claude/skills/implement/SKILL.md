@@ -6,7 +6,7 @@ description: Does the technical planning and implementation of a story.
 Implements a story task by task, with the user reviewing each task.
 
 ## Instructions
-1. Run the `/caveman lite` skill.
+1. Run the `/caveman lite` skill unless caveman mode is already on.
 2. Create a plan with the `/create-implementation-plan` skill. If a plan already exists in `artifacts/implementation-plans/`, resume from its task statuses.
 3. Implement all tasks according to `artifacts/standards.md`.
 4. Iterate over the tasks with the process below.

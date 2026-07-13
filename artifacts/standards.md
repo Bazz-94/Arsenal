@@ -9,6 +9,7 @@ Full-stack website, hosts multiple tools. Built with Next.js (App Router) and Ta
 - **Shared files**: Code shared across tools goes in `lib/` (logic/utilities) or `components/` (UI) at project root. No duplicating per tool.
 - **Abstraction**: Shared systems (e.g. caching) go through one common interface, so implementation can change without touching tools.
 - **Styling**: Component styling pulls from shared design tokens/theme, not one-off hardcoded values, for consistent look across tools.
+- **Unit test**: We will unit test backend code.
 
 ## Design Principles
 

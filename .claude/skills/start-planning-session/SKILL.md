@@ -4,7 +4,7 @@ description: Start a planning session with the user.
 ---
 
 ## Starting Instructions
-1. Run the `/caveman lite` skill.
+1. Run the `/caveman lite` skill unless caveman mode is already on.
 2. Ask the user for a brief description of the task to plan.
 3. Check existing stories in `/artifacts/stories/` to prevent duplicate functionality.
 4. Ask the user for context: relevant information, constraints, requirements.

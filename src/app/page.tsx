@@ -1,9 +1,27 @@
-import Image from "next/image";
+import ToolCard, { type Tool } from "@/src/components/ToolCard";
+
+const tools: Tool[] = [
+  {
+    name: "Steam Intersect",
+    description: "Find Steam games you and your friends own in common.",
+    path: "/steam-intersect",
+  },
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <h1>Home</h1>
-    </div>
+    <main className="flex flex-col flex-1 items-center px-4 py-16">
+      <div className="w-full max-w-4xl">
+        <h1 className="text-4xl font-semibold">Arsenal</h1>
+        <p className="mt-2 text-foreground/70">
+          A collection of small web tools.
+        </p>
+        <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {tools.map((tool) => (
+            <ToolCard key={tool.path} {...tool} />
+          ))}
+        </ul>
+      </div>
+    </main>
   );
 }
