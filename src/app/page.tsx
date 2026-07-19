@@ -1,5 +1,6 @@
 import ToolCard, { type Tool } from "@/src/components/ToolCard";
 
+/** All tools available on the site, rendered as menu cards. */
 const tools: Tool[] = [
   {
     name: "Steam Intersect",
@@ -8,6 +9,7 @@ const tools: Tool[] = [
   },
 ];
 
+/** Home page: static menu of available tools. */
 export default function Home() {
   return (
     <main className="flex flex-col flex-1 items-center px-4 py-16">

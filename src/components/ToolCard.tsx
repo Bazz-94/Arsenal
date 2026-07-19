@@ -1,11 +1,16 @@
 import Link from "next/link";
 
+/** Metadata describing one tool listed on the home page menu. */
 export type Tool = {
+  /** Display name shown as the card title. */
   name: string;
+  /** One-line summary shown under the name. */
   description: string;
+  /** Route path the card links to (e.g. `/steam-intersect`). */
   path: string;
 };
 
+/** Home page menu card linking to a single tool. */
 export default function ToolCard({ name, description, path }: Tool) {
   return (
     <li>

@@ -1,6 +1,6 @@
 # Story: Intersect - Enter SteamID and Select Friends
 
-- Status: not started
+- Status: completed
 - Dependency: sa-01-home-page-tool-menu
 
 ## Description
@@ -11,6 +11,7 @@ A user visits the Intersect tool and enters their own Steam identity (vanity URL
 - The app resolves the entered value to a valid SteamID64 before proceeding.
 - If the SteamID can't be resolved (invalid input, not found), the user sees a clear error and can retry.
 - On success, the app displays the user's Steam friend list (name + avatar per friend).
+- The user can filter the displayed list by name (case-insensitive); filtering does not change selections.
 - The user can select up to 10 people from the list.
 - The user cannot select more than 10 people; attempting to exceed the limit is prevented with feedback.
 - The user can proceed to view results (sa-03) once at least 2 people are selected selected.

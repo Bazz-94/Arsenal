@@ -1,0 +1,89 @@
+import { create } from "zustand";
+import type { SteamProfile } from "@/src/lib/shared/steam/types";
+import type { LookupErrorCode, LookupFriendsResult } from "@/src/lib/steam-intersect/lookupFriends";
+
+/** Max people (including self) that can be included in the intersection. */
+export const MAX_SELECTED = 10;
+/** Minimum selections before the user can proceed to results. */
+export const MIN_SELECTED = 2;
+
+/** State and actions for the Steam Intersect selection step. */
+type IntersectState = {
+  /** Error code from the last failed lookup, if any. */
+  error: LookupErrorCode | null;
+  /** Resolved profiles; sorted with filter matches first. */
+  profiles: SteamProfile[] | null;
+  /** SteamID64s currently selected. */
+  selected: Set<string>;
+  /** Name filter applied to the profile list (case-insensitive). */
+  filter: string;
+  /** True when the user just tried to select beyond the limit. */
+  limitHit: boolean;
+  /** Sets the name filter text and sorts matching profiles to the top. */
+  setFilter: (filter: string) => void;
+  /**
+   * Applies a lookup result: on success stores the profiles (self first)
+   * with self pre-selected; on failure stores the error and clears the
+   * profiles.
+   */
+  applyLookup: (result: LookupFriendsResult) => void;
+  /** Toggles one profile's selection, enforcing the cap with feedback. */
+  toggle: (steamId: string) => void;
+};
+
+/**
+ * Sorts profiles whose name contains `filter` (case-insensitive) to the
+ * top, keeping relative order within each group.
+ */
+function sortByFilter(
+  profiles: SteamProfile[] | null,
+  filter: string
+): SteamProfile[] | null {
+  if (!profiles) return null;
+  const needle = filter.trim().toLowerCase();
+  const matches = (profile: SteamProfile) =>
+    profile.name.toLowerCase().includes(needle);
+  return [...profiles.filter(matches), ...profiles.filter(p => !matches(p))];
+}
+
+/** Zustand store backing the Steam Intersect selection step. */
+export const useIntersectStore = create<IntersectState>(set => ({
+  error: null,
+  profiles: null,
+  selected: new Set<string>(),
+  filter: "",
+  limitHit: false,
+
+  setFilter: filter =>
+    set(state => ({
+      filter,
+      profiles: sortByFilter(state.profiles, filter),
+    })),
+
+  applyLookup: result =>
+    set(() => {
+      if (!result.ok) {
+        return { error: result.error, profiles: null };
+      }
+      return {
+        error: null,
+        profiles: [result.self, ...result.friends],
+        selected: new Set([result.self.steamId]),
+        limitHit: false,
+        filter: "",
+      };
+    }),
+
+  toggle: steamId =>
+    set(state => {
+      const next = new Set(state.selected);
+      if (next.has(steamId)) {
+        next.delete(steamId);
+      } else if (next.size >= MAX_SELECTED) {
+        return { limitHit: true };
+      } else {
+        next.add(steamId);
+      }
+      return { selected: next, limitHit: false };
+    }),
+}));
