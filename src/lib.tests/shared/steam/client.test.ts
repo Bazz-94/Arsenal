@@ -197,3 +197,74 @@ describe("SteamApiClient.getPlayerSummaries", () => {
     expect(fetchFn).toHaveBeenCalledTimes(1);
   });
 });
+
+/** Builds a raw Steam owned-game entry. */
+function ownedGame(overrides: Record<string, unknown> = {}) {
+  return {
+    appid: 440,
+    name: "Team Fortress 2",
+    img_icon_url: "abc123",
+    ...overrides,
+  };
+}
+
+describe("SteamApiClient.getOwnedGames", () => {
+  it("maps owned games, building the icon URL from appid and img_icon_url", async () => {
+    const fetchFn = vi.fn(async (url: RequestInfo | URL) => {
+      expect(String(url)).toContain("GetOwnedGames");
+      expect(String(url)).toContain("include_appinfo=true");
+      return jsonResponse({
+        response: { game_count: 1, games: [ownedGame()] },
+      });
+    });
+    const client = makeClient(fetchFn as typeof fetch);
+    await expect(client.getOwnedGames("76561197960287930")).resolves.toEqual([
+      {
+        appid: 440,
+        name: "Team Fortress 2",
+        iconUrl:
+          "https://media.steampowered.com/steamcommunity/public/images/apps/440/abc123.jpg",
+      },
+    ]);
+  });
+
+  it("returns null iconUrl when img_icon_url is empty", async () => {
+    const fetchFn = vi.fn(async () =>
+      jsonResponse({
+        response: { game_count: 1, games: [ownedGame({ img_icon_url: "" })] },
+      })
+    );
+    const client = makeClient(fetchFn as typeof fetch);
+    const games = await client.getOwnedGames("76561197960287930");
+    expect(games?.[0].iconUrl).toBeNull();
+  });
+
+  it("returns null when the response has no games field", async () => {
+    const fetchFn = vi.fn(async () => jsonResponse({ response: {} }));
+    const client = makeClient(fetchFn as typeof fetch);
+    await expect(
+      client.getOwnedGames("76561197960287930")
+    ).resolves.toBeNull();
+  });
+
+  it("caches owned games per steamId", async () => {
+    const fetchFn = vi.fn(async () =>
+      jsonResponse({ response: { game_count: 1, games: [ownedGame()] } })
+    );
+    const client = makeClient(fetchFn as typeof fetch);
+    await client.getOwnedGames("76561197960287930");
+    await client.getOwnedGames("76561197960287930");
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+  });
+
+  it("throws api-failure on a non-OK response", async () => {
+    const fetchFn = vi.fn(async () => jsonResponse({}, 500));
+    const client = makeClient(fetchFn as typeof fetch);
+    await expect(
+      client.getOwnedGames("76561197960287930")
+    ).rejects.toMatchObject({
+      name: "SteamApiError",
+      code: "api-failure",
+    });
+  });
+});

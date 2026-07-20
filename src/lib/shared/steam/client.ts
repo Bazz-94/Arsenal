@@ -1,8 +1,11 @@
 import type { Cache } from "../cache";
-import { SteamApiError, type SteamProfile } from "./types";
+import { SteamApiError, type SteamGame, type SteamProfile } from "./types";
 
 /** Root URL of the Steam Web API. */
 const BASE_URL = "https://api.steampowered.com";
+/** Root URL Steam serves game icon images from. */
+const ICON_BASE_URL =
+  "https://media.steampowered.com/steamcommunity/public/images/apps";
 
 /** TTL applied to every cached Steam response (5 minutes). */
 export const STEAM_CACHE_TTL_MS = 5 * 60 * 1000;
@@ -53,6 +56,30 @@ type PlayerSummariesResponse = {
   };
 };
 
+/** Subset of Steam's GetOwnedGames game object that we consume. */
+type OwnedGame = {
+  /** The game's Steam application id. */
+  appid: number;
+  /** The game's display name (present when `include_appinfo` is set). */
+  name: string;
+  /** Hash used to build the game's icon URL; empty when Steam has none. */
+  img_icon_url: string;
+};
+
+/**
+ * Shape of the GetOwnedGames v1 response body. `games`/`game_count` are
+ * both absent when the profile or its game details are private.
+ */
+type OwnedGamesResponse = {
+  /** Result wrapper. */
+  response: {
+    /** Number of owned games; absent when the library isn't visible. */
+    game_count?: number;
+    /** Owned games; absent when the library isn't visible. */
+    games?: OwnedGame[];
+  };
+};
+
 /**
  * Maps a raw Steam player summary to the app's `SteamProfile` shape.
  * `communityvisibilitystate` 3 means public; anything else is flagged
@@ -64,6 +91,17 @@ export function mapPlayerToProfile(player: PlayerSummary): SteamProfile {
     name: player.personaname,
     avatarUrl: player.avatarfull,
     isPrivate: player.communityvisibilitystate !== 3,
+  };
+}
+
+/** Maps a raw Steam owned-game entry to the app's `SteamGame` shape. */
+function mapOwnedGame(game: OwnedGame): SteamGame {
+  return {
+    appid: game.appid,
+    name: game.name,
+    iconUrl: game.img_icon_url
+      ? `${ICON_BASE_URL}/${game.appid}/${game.img_icon_url}.jpg`
+      : null,
   };
 }
 
@@ -183,6 +221,30 @@ export class SteamApiClient {
 
     this.cache.set(cacheKey, profiles, STEAM_CACHE_TTL_MS);
     return profiles;
+  }
+
+  /**
+   * Fetches a player's owned games via GetOwnedGames.
+   *
+   * @param steamId The player's SteamID64.
+   * @returns Owned games, or `null` when Steam returns no games field
+   * (the profile or its game details are private).
+   */
+  async getOwnedGames(steamId: string): Promise<SteamGame[] | null> {
+    const cacheKey = `steam:owned-games:${steamId}`;
+    const cached = this.cache.get<SteamGame[] | null>(cacheKey);
+    if (cached !== undefined) return cached;
+
+    const data = await this.request<OwnedGamesResponse>(
+      "/IPlayerService/GetOwnedGames/v1/",
+      { steamid: steamId, include_appinfo: "true" }
+    );
+    const games = data.response.games
+      ? data.response.games.map(mapOwnedGame)
+      : null;
+
+    this.cache.set(cacheKey, games, STEAM_CACHE_TTL_MS);
+    return games;
   }
 
   /**

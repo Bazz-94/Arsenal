@@ -12,6 +12,16 @@ export type SteamProfile = {
   isPrivate: boolean;
 };
 
+/** One game from a Steam library. */
+export type SteamGame = {
+  /** The game's Steam application id. */
+  appid: number;
+  /** The game's display name. */
+  name: string;
+  /** Absolute URL of the game's small icon, or `null` when Steam has none. */
+  iconUrl: string | null;
+};
+
 /**
  * Machine-readable failure categories surfaced to callers:
  * - `not-found` — the entered identity could not be resolved.
