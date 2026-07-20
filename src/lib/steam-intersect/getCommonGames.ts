@@ -1,5 +1,5 @@
 import type { SteamApiClient } from "../shared/steam/client";
-import { SteamApiError, type SteamGame } from "../shared/steam/types";
+import { SteamApiError, type SteamGame, type SteamProfile } from "../shared/steam/types";
 
 /** Why a profile was left out of the intersection. */
 export type ExclusionReason = "private" | "unavailable";
@@ -17,6 +17,8 @@ export type CommonGamesResult =
   | {
       /** Discriminator: at least one profile resolved and had a library. */
       ok: true;
+      /** Profiles whose library was readable and factored into `games`. */
+      profiles: SteamProfile[];
       /** Games owned by every included profile, sorted alphabetically. */
       games: SteamGame[];
       /** Profiles left out of the intersection, if any. */
@@ -44,9 +46,9 @@ export async function getCommonGames(
   client: SteamApiClient,
   steamIds: string[]
 ): Promise<CommonGamesResult> {
-  let profiles;
+  let summaries;
   try {
-    profiles = await client.getPlayerSummaries(steamIds);
+    summaries = await client.getPlayerSummaries(steamIds);
   } catch (error) {
     if (!(error instanceof SteamApiError)) throw error;
     return {
@@ -54,7 +56,7 @@ export async function getCommonGames(
       excluded: steamIds.map(steamId => ({ label: steamId, reason: "unavailable" })),
     };
   }
-  const profileById = new Map(profiles.map(profile => [profile.steamId, profile]));
+  const profileById = new Map(summaries.map(profile => [profile.steamId, profile]));
 
   const results = await Promise.all(
     steamIds.map(async steamId => {
@@ -79,7 +81,7 @@ export async function getCommonGames(
         };
       }
 
-      return { included: { games } };
+      return { included: { profile, games } };
     })
   );
 
@@ -108,5 +110,5 @@ export async function getCommonGames(
     .map(appId => gameByAppId.get(appId)!)
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  return { ok: true, games, excluded };
+  return { ok: true, profiles: included.map(entry => entry.profile), games, excluded };
 }

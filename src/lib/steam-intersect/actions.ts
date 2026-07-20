@@ -2,6 +2,7 @@
 
 import { getSteamClient } from "@/src/lib/shared/steam/server";
 import { lookupProfiles, type LookupProfilesResult } from "@/src/lib/steam-intersect/lookupProfiles";
+import { getCommonGames, type CommonGamesResult } from "@/src/lib/steam-intersect/getCommonGames";
 
 /**
  * Server Function: resolves the entered Steam identity (vanity name,
@@ -15,4 +16,17 @@ export async function lookupSteamProfiles(
   input: string
 ): Promise<LookupProfilesResult> {
   return lookupProfiles(getSteamClient(), input);
+}
+
+/**
+ * Server Function: recomputes the common-games intersection for the given
+ * SteamID64s. Used by the results page to update the list as the user
+ * toggles profiles in or out.
+ *
+ * @param steamIds SteamID64s currently selected.
+ */
+export async function recomputeCommonGames(
+  steamIds: string[]
+): Promise<CommonGamesResult> {
+  return getCommonGames(getSteamClient(), steamIds);
 }

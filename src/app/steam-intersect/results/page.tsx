@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { getSteamClient } from "@/src/lib/shared/steam/server";
-import { getCommonGames, type ExcludedProfile } from "@/src/lib/steam-intersect/getCommonGames";
+import { getCommonGames } from "@/src/lib/steam-intersect/getCommonGames";
 import { MIN_SELECTED } from "../store";
+import { ResultsView } from "./ResultsView";
 
 /** Page metadata for the Steam Intersect results view. */
 export const metadata: Metadata = {
@@ -31,7 +31,10 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
   return (
     <main className="flex flex-col flex-1 items-center px-4 py-16">
       <div className="w-full max-w-4xl">
-        <h1 className="text-3xl font-semibold">Common Games</h1>
+        <Link href="/steam-intersect" className="text-sm text-foreground/70 underline">
+          Back to selection
+        </Link>
+        <h1 className="mt-2 text-3xl font-semibold">Common Games</h1>
         {ids.length < MIN_SELECTED ? (
           <SelectionRequiredNotice />
         ) : (
@@ -46,15 +49,12 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
 function SelectionRequiredNotice() {
   return (
     <p className="mt-4 text-foreground/70">
-      Select at least {MIN_SELECTED} people to compare.{" "}
-      <Link href="/steam-intersect" className="underline">
-        Back to selection
-      </Link>
+      Select at least {MIN_SELECTED} people to compare.
     </p>
   );
 }
 
-/** Fetches and renders the common-games lookup for `ids`. */
+/** Fetches the initial common-games lookup for `ids` and hands off to `ResultsView`. */
 async function Results({ ids }: { ids: string[] }) {
   const result = await getCommonGames(getSteamClient(), ids);
 
@@ -68,45 +68,10 @@ async function Results({ ids }: { ids: string[] }) {
   }
 
   return (
-    <>
-      {result.excluded.length > 0 && (
-        <p role="alert" className="mt-4 text-sm text-red-600 dark:text-red-400">
-          Excluded from the comparison: {result.excluded.map(describeExclusion).join(", ")}.
-        </p>
-      )}
-
-      {result.games.length === 0 ? (
-        <p className="mt-4 text-foreground/70">
-          No games are common to everyone selected.
-        </p>
-      ) : (
-        <ul className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {result.games.map(game => (
-            <li
-              key={game.appid}
-              className="flex items-center gap-3 rounded-lg border border-card-border bg-card p-3"
-            >
-              {game.iconUrl ? (
-                <Image
-                  src={game.iconUrl}
-                  alt=""
-                  width={32}
-                  height={32}
-                  className="rounded"
-                />
-              ) : (
-                <div className="h-8 w-8 rounded bg-foreground/10" aria-hidden />
-              )}
-              <span className="min-w-0 flex-1 truncate">{game.name}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </>
+    <ResultsView
+      initialProfiles={result.profiles}
+      initialGames={result.games}
+      excluded={result.excluded}
+    />
   );
-}
-
-/** Human-readable summary of one excluded profile. */
-function describeExclusion({ label, reason }: ExcludedProfile): string {
-  return reason === "private" ? `${label} (private profile)` : `${label} (unavailable)`;
 }

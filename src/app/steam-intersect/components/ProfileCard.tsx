@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import type { Profile } from "@/src/lib/steam-intersect/types";
+import type { SteamProfile } from "@/src/lib/shared/steam/types";
 
 /** Props for `ProfileCard`. */
 type ProfileCardProps = {
   /** The profile to render. */
-  profile: Profile;
+  profile: SteamProfile;
   /** True for the resolved user's own entry. */
   isSelf: boolean;
   /** True when the profile is currently selected. */
