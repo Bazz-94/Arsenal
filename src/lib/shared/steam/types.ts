@@ -10,8 +10,6 @@ export type SteamProfile = {
   avatarUrl: string;
   /** True when the profile is not public (communityvisibilitystate != 3). */
   isPrivate: boolean;
-  /** True when this profile is the current user's profile. */
-  isUser: boolean;
 };
 
 /**

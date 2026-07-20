@@ -1,4 +1,4 @@
-import type { Cache } from "../../cache";
+import type { Cache } from "../cache";
 import { SteamApiError, type SteamProfile } from "./types";
 
 /** Root URL of the Steam Web API. */
@@ -64,7 +64,6 @@ export function mapPlayerToProfile(player: PlayerSummary): SteamProfile {
     name: player.personaname,
     avatarUrl: player.avatarfull,
     isPrivate: player.communityvisibilitystate !== 3,
-    isUser: false,
   };
 }
 

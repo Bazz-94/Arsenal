@@ -1,5 +1,5 @@
 import "server-only";
-import { InMemoryCache } from "../../cache";
+import { InMemoryCache } from "../cache";
 import { SteamApiClient } from "./client";
 
 /** Lazily created singleton shared across requests. */

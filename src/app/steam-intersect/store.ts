@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import type { SteamProfile } from "@/src/lib/shared/steam/types";
-import type { LookupErrorCode, LookupFriendsResult } from "@/src/lib/steam-intersect/lookupFriends";
+import type { Profile } from "@/src/lib/steam-intersect/types";
+import type { LookupErrorCode, LookupProfilesResult } from "@/src/lib/steam-intersect/lookupProfiles";
 
 /** Max people (including self) that can be included in the intersection. */
 export const MAX_SELECTED = 10;
@@ -12,7 +12,7 @@ type IntersectState = {
   /** Error code from the last failed lookup, if any. */
   error: LookupErrorCode | null;
   /** Resolved profiles; sorted with filter matches first. */
-  profiles: SteamProfile[] | null;
+  profiles: Profile[] | null;
   /** SteamID64s currently selected. */
   selected: Set<string>;
   /** Name filter applied to the profile list (case-insensitive). */
@@ -26,7 +26,7 @@ type IntersectState = {
    * with self pre-selected; on failure stores the error and clears the
    * profiles.
    */
-  applyLookup: (result: LookupFriendsResult) => void;
+  applyLookup: (result: LookupProfilesResult) => void;
   /** Toggles one profile's selection, enforcing the cap with feedback. */
   toggle: (steamId: string) => void;
 };
@@ -36,12 +36,12 @@ type IntersectState = {
  * top, keeping relative order within each group.
  */
 function sortByFilter(
-  profiles: SteamProfile[] | null,
+  profiles: Profile[] | null,
   filter: string
-): SteamProfile[] | null {
+): Profile[] | null {
   if (!profiles) return null;
   const needle = filter.trim().toLowerCase();
-  const matches = (profile: SteamProfile) =>
+  const matches = (profile: Profile) =>
     profile.name.toLowerCase().includes(needle);
   return [...profiles.filter(matches), ...profiles.filter(p => !matches(p))];
 }

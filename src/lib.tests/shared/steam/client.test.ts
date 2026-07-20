@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { InMemoryCache } from "../../../lib/cache";
+import { InMemoryCache } from "../../../lib/shared/cache";
 import {
   PLAYER_SUMMARIES_BATCH_SIZE,
   SteamApiClient,
@@ -42,7 +42,6 @@ describe("mapPlayerToProfile", () => {
       name: "player-1",
       avatarUrl: "https://avatars.example/1.jpg",
       isPrivate: false,
-      isUser: false,
     });
   });
 

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { InMemoryCache } from "../lib/cache";
+import { InMemoryCache } from "../lib/shared/cache";
 
 describe("in-memory TTL cache", () => {
   beforeEach(() => {

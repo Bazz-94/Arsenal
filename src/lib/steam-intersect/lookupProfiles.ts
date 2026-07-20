@@ -1,19 +1,20 @@
 import { parseSteamIdentity } from "../shared/steam/identity";
-import { SteamApiError, type SteamErrorCode, type SteamProfile } from "../shared/steam/types";
+import { SteamApiError, type SteamErrorCode } from "../shared/steam/types";
 import type { SteamApiClient } from "../shared/steam/client";
+import type { Profile } from "./types";
 
-/** Failure categories for a friends lookup, including bad user input. */
+/** Failure categories for a profiles lookup, including bad user input. */
 export type LookupErrorCode = SteamErrorCode | "invalid-input";
 
 /** Result of resolving a Steam identity and fetching its friend list. */
-export type LookupFriendsResult =
+export type LookupProfilesResult =
   | {
       /** Discriminator: the lookup succeeded. */
       ok: true;
-      /** The resolved user, shaped like a friend so it can be selected. */
-      self: SteamProfile;
+      /** The resolved user, shaped like the other profiles so it can be selected. */
+      self: Profile;
       /** The user's friends with name, avatar, and privacy flag. */
-      friends: SteamProfile[];
+      friends: Profile[];
     }
   | {
       /** Discriminator: the lookup failed. */
@@ -28,14 +29,14 @@ export type LookupFriendsResult =
  *
  * @param client Steam API client to call.
  * @param input Raw identity text the user entered.
- * @returns Self + friends on success, or a typed error: `invalid-input`
- * (unparseable), `not-found` (vanity or id doesn't exist), `private-list`
- * (friend list hidden), `api-failure` (Steam unreachable).
+ * @returns Self + friend profiles on success, or a typed error:
+ * `invalid-input` (unparseable), `not-found` (vanity or id doesn't exist),
+ * `private-list` (friend list hidden), `api-failure` (Steam unreachable).
  */
-export async function lookupFriends(
+export async function lookupProfiles(
   client: SteamApiClient,
   input: string
-): Promise<LookupFriendsResult> {
+): Promise<LookupProfilesResult> {
   try {
     const identity = parseSteamIdentity(input);
     if (!identity) return { ok: false, error: "invalid-input" };
@@ -59,7 +60,9 @@ export async function lookupFriends(
     return {
       ok: true,
       self: { ...self, isUser: true },
-      friends: profiles.filter(profile => profile.steamId !== steamId),
+      friends: profiles
+        .filter(profile => profile.steamId !== steamId)
+        .map(profile => ({ ...profile, isUser: false })),
     };
   } catch (error) {
     if (error instanceof SteamApiError) {

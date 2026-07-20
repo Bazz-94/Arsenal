@@ -1,7 +1,7 @@
 "use server";
 
 import { getSteamClient } from "@/src/lib/shared/steam/server";
-import { lookupFriends, type LookupFriendsResult } from "@/src/lib/steam-intersect/lookupFriends";
+import { lookupProfiles, type LookupProfilesResult } from "@/src/lib/steam-intersect/lookupProfiles";
 
 /**
  * Server Function: resolves the entered Steam identity (vanity name,
@@ -13,6 +13,6 @@ import { lookupFriends, type LookupFriendsResult } from "@/src/lib/steam-interse
  */
 export async function lookupSteamProfiles(
   input: string
-): Promise<LookupFriendsResult> {
-  return lookupFriends(getSteamClient(), input);
+): Promise<LookupProfilesResult> {
+  return lookupProfiles(getSteamClient(), input);
 }
