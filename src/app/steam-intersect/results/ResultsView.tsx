@@ -26,6 +26,10 @@ type ResultsViewProps = {
 export function ResultsView({ initialProfiles, initialGames, excluded: initialExcluded }: ResultsViewProps) {
   /** SteamID64 of the resolved user (always first in `initialProfiles`). */
   const selfId = initialProfiles[0]?.steamId;
+  /** Profiles sorted by display name for rendering. */
+  const sortedProfiles = [...initialProfiles].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
   /** SteamID64s currently included in the comparison. */
   const [selected, setSelected] = useState(
     () => new Set(initialProfiles.map(profile => profile.steamId))
@@ -98,7 +102,7 @@ export function ResultsView({ initialProfiles, initialGames, excluded: initialEx
         </button>
       </div>
       <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {initialProfiles.map(profile => (
+        {sortedProfiles.map(profile => (
           <ProfileCard
             key={profile.steamId}
             profile={profile}

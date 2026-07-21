@@ -31,6 +31,8 @@ function playerSummary(id: string, overrides: Record<string, unknown> = {}) {
     personaname: `player-${id}`,
     avatarfull: `https://avatars.example/${id}.jpg`,
     communityvisibilitystate: 3,
+    personastate: 1,
+    lastlogoff: 1_700_000_000,
     ...overrides,
   };
 }
@@ -42,6 +44,8 @@ describe("mapPlayerToProfile", () => {
       name: "player-1",
       avatarUrl: "https://avatars.example/1.jpg",
       isPrivate: false,
+      personaState: 1,
+      lastLogoff: 1_700_000_000,
     });
   });
 

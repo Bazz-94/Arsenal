@@ -22,6 +22,10 @@ type PlayerSummary = {
   avatarfull: string;
   /** Profile visibility: 3 = public, 1/2 = private or friends-only. */
   communityvisibilitystate: number;
+  /** Online status: 0 offline, 1 online, 2 busy, 3 away, 4 snooze, 5 looking to trade, 6 looking to play. */
+  personastate: number;
+  /** Unix timestamp (seconds) of the player's last logoff; absent when Steam doesn't report it. */
+  lastlogoff?: number;
 };
 
 /** Shape of the ResolveVanityURL v1 response body. */
@@ -91,6 +95,8 @@ export function mapPlayerToProfile(player: PlayerSummary): SteamProfile {
     name: player.personaname,
     avatarUrl: player.avatarfull,
     isPrivate: player.communityvisibilitystate !== 3,
+    personaState: player.personastate,
+    lastLogoff: player.lastlogoff ?? null,
   };
 }
 

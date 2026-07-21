@@ -1,7 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import type { SteamProfile } from "@/src/lib/shared/steam/types";
+import {
+  formatOfflineDuration,
+  PERSONA_STATE_COLORS,
+  PERSONA_STATE_LABELS,
+  type SteamProfile,
+} from "@/src/lib/shared/steam/types";
 
 /** Props for `ProfileCard`. */
 type ProfileCardProps = {
@@ -18,6 +23,18 @@ type ProfileCardProps = {
 /** Tooltip shown on the "private" badge explaining why selection is off. */
 const PRIVATE_TOOLTIP =
   "Game libraries are only visible on public Steam profiles, so private profiles can't be included in the comparison.";
+
+/**
+ * Status text shown under the display name: how long ago the profile went
+ * offline when applicable, otherwise the persona state label.
+ */
+function statusLabel(profile: SteamProfile): string {
+  if (profile.personaState === 0 && profile.lastLogoff !== null) {
+    const duration = formatOfflineDuration(profile.lastLogoff);
+    return duration === "just now" ? "Last online just now" : `Last online ${duration} ago`;
+  }
+  return PERSONA_STATE_LABELS[profile.personaState] ?? PERSONA_STATE_LABELS[0];
+}
 
 /** One selectable profile row: avatar, name, and badges. */
 export function ProfileCard({ profile, isSelf, isSelected, onToggle }: ProfileCardProps) {
@@ -43,7 +60,14 @@ export function ProfileCard({ profile, isSelf, isSelected, onToggle }: ProfileCa
           height={40}
           className="rounded"
         />
-        <span className="min-w-0 flex-1 truncate">{profile.name}</span>
+        <span className="min-w-0 flex-1 truncate">
+          <span className="block truncate">{profile.name}</span>
+          <span
+            className={`block truncate text-xs ${PERSONA_STATE_COLORS[profile.personaState] ?? PERSONA_STATE_COLORS[0]}`}
+          >
+            {statusLabel(profile)}
+          </span>
+        </span>
         {isSelf && (
           <span className="rounded bg-foreground/10 px-2 py-0.5 text-xs">you</span>
         )}

@@ -74,7 +74,9 @@ export const useIntersectStore = create<IntersectState>(set => ({
       }
       return {
         error: null,
-        profiles: [result.self, ...result.friends],
+        profiles: [result.self, ...result.friends].sort((a, b) =>
+          a.name.localeCompare(b.name)
+        ),
         selected: new Set([result.self.steamId]),
         limitHit: false,
         filter: "",

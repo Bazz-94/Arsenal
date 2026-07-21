@@ -11,6 +11,8 @@ function profile(steamId: string, overrides: Partial<Profile> = {}): Profile {
     name: `player-${steamId}`,
     avatarUrl: `https://avatars.example/${steamId}.jpg`,
     isPrivate: false,
+    personaState: 1,
+    lastLogoff: 1_700_000_000,
     isUser: false,
     ...overrides,
   };

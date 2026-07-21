@@ -10,7 +10,60 @@ export type SteamProfile = {
   avatarUrl: string;
   /** True when the profile is not public (communityvisibilitystate != 3). */
   isPrivate: boolean;
+  /** Raw Steam `personastate` value (online/busy/away/etc). */
+  personaState: number;
+  /** Unix timestamp (seconds) of the last logoff, or `null` when Steam didn't report one. */
+  lastLogoff: number | null;
 };
+
+/** Label shown for each Steam `personastate` value. */
+export const PERSONA_STATE_LABELS: Record<number, string> = {
+  0: "Offline",
+  1: "Online",
+  2: "Busy",
+  3: "Away",
+  4: "Snooze",
+  5: "Looking to trade",
+  6: "Looking to play",
+};
+
+/** Tailwind text color class for each Steam `personastate` value. */
+export const PERSONA_STATE_COLORS: Record<number, string> = {
+  0: "text-foreground/50",
+  1: "text-green-500",
+  2: "text-red-500",
+  3: "text-yellow-500",
+  4: "text-yellow-500",
+  5: "text-blue-500",
+  6: "text-blue-500",
+};
+
+/** Longest-to-shortest unit steps used by `formatOfflineDuration`. */
+const DURATION_UNITS: Array<{ label: string; seconds: number }> = [
+  { label: "year", seconds: 60 * 60 * 24 * 365 },
+  { label: "month", seconds: 60 * 60 * 24 * 30 },
+  { label: "day", seconds: 60 * 60 * 24 },
+  { label: "hour", seconds: 60 * 60 },
+  { label: "minute", seconds: 60 },
+];
+
+/**
+ * Formats how long ago `lastLogoff` was, relative to `now`, as e.g.
+ * "3 hours" or "1 day". Rounds down to the largest whole unit; anything
+ * under a minute reports "just now".
+ *
+ * @param lastLogoff Unix timestamp (seconds) of the last logoff.
+ * @param now Current time; defaults to `Date.now()`.
+ */
+export function formatOfflineDuration(lastLogoff: number, now: number = Date.now()): string {
+  const elapsedSeconds = Math.max(0, Math.floor(now / 1000) - lastLogoff);
+
+  for (const unit of DURATION_UNITS) {
+    const value = Math.floor(elapsedSeconds / unit.seconds);
+    if (value >= 1) return `${value} ${unit.label}${value === 1 ? "" : "s"}`;
+  }
+  return "just now";
+}
 
 /** One game from a Steam library. */
 export type SteamGame = {

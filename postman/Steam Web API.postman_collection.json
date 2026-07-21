@@ -1,0 +1,104 @@
+{
+  "info": {
+    "name": "Steam Web API",
+    "description": "Steam Web API requests used by the Steam Intersect tool (src/lib/shared/steam/client.ts): resolving a vanity URL, reading a friend list, reading player summaries, and reading owned games.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.steampowered.com"
+    },
+    {
+      "key": "apiKey",
+      "value": "",
+      "description": "Steam Web API key (STEAM_API_KEY in .env.local)"
+    },
+    {
+      "key": "steamId",
+      "value": "",
+      "description": "A SteamID64, e.g. one resolved from ResolveVanityURL"
+    },
+    {
+      "key": "vanityUrl",
+      "value": "",
+      "description": "Custom profile name, e.g. the 'gabelogannewell' in steamcommunity.com/id/gabelogannewell"
+    }
+  ],
+  "item": [
+    {
+      "name": "ResolveVanityURL",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/ISteamUser/ResolveVanityURL/v1/?key={{apiKey}}&vanityurl={{vanityUrl}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["ISteamUser", "ResolveVanityURL", "v1"],
+          "query": [
+            { "key": "key", "value": "{{apiKey}}" },
+            { "key": "vanityurl", "value": "{{vanityUrl}}" }
+          ]
+        },
+        "description": "Resolves a vanity profile name to a SteamID64. response.success is 1 on match, 42 when no profile matches that name."
+      }
+    },
+    {
+      "name": "GetFriendList",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/ISteamUser/GetFriendList/v1/?key={{apiKey}}&steamid={{steamId}}&relationship=friend",
+          "host": ["{{baseUrl}}"],
+          "path": ["ISteamUser", "GetFriendList", "v1"],
+          "query": [
+            { "key": "key", "value": "{{apiKey}}" },
+            { "key": "steamid", "value": "{{steamId}}" },
+            { "key": "relationship", "value": "friend" }
+          ]
+        },
+        "description": "Lists a user's friends' SteamID64s. Returns HTTP 401 when the friend list is private."
+      }
+    },
+    {
+      "name": "GetPlayerSummaries",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/ISteamUser/GetPlayerSummaries/v2/?key={{apiKey}}&steamids={{steamId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["ISteamUser", "GetPlayerSummaries", "v2"],
+          "query": [
+            { "key": "key", "value": "{{apiKey}}" },
+            {
+              "key": "steamids",
+              "value": "{{steamId}}",
+              "description": "Comma-separated SteamID64s, up to 100 per call"
+            }
+          ]
+        },
+        "description": "Fetches name, avatar, and profile visibility (communityvisibilitystate: 3 = public) for the given SteamID64s. Unknown ids are omitted from the response."
+      }
+    },
+    {
+      "name": "GetOwnedGames",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/IPlayerService/GetOwnedGames/v1/?key={{apiKey}}&steamid={{steamId}}&include_appinfo=true",
+          "host": ["{{baseUrl}}"],
+          "path": ["IPlayerService", "GetOwnedGames", "v1"],
+          "query": [
+            { "key": "key", "value": "{{apiKey}}" },
+            { "key": "steamid", "value": "{{steamId}}" },
+            {
+              "key": "include_appinfo",
+              "value": "true",
+              "description": "Include game name and icon hash in the response"
+            }
+          ]
+        },
+        "description": "Fetches a user's owned games. response.games/game_count are both absent when the profile or game details are private."
+      }
+    }
+  ]
+}

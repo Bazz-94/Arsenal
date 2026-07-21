@@ -10,24 +10,46 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run build` — production build
 - `npm run start` — run the production build
 - `npm run lint` — lint with ESLint (flat config, `eslint.config.mjs`)
+- `npm test` — run the vitest suite once (`vitest run`)
+- `npx vitest run <path>` — run a single test file
+- `npx tsc --noEmit` — typecheck
 
-There is no test runner configured in this repo yet.
+Requires `STEAM_API_KEY` in `.env.local` for the Steam Intersect tool to work locally (see `src/lib/shared/steam/server.ts`).
 
 ## Architecture
 
-- Next.js App Router (`app/`), TypeScript, Tailwind CSS v4 (via `@tailwindcss/postcss`, no `tailwind.config`).
-- `app/layout.tsx` — root layout; loads Geist Sans/Mono via `next/font/google` and sets global metadata.
-- `app/page.tsx` — home page.
-- Path alias `@/*` resolves to the project root (`tsconfig.json`).
-- Per the README, this project is intended to become "a full stack website that hosts multiple tools" — currently just the scaffolded starter page.
+Next.js App Router, TypeScript, Tailwind CSS v4 (`@tailwindcss/postcss`, no `tailwind.config`). All app code lives under `src/` (not root `app/`); path alias `@/*` resolves to the project root, so imports look like `@/src/lib/...`.
 
-## Planned work
+This is a multi-tool site (see `artifacts/standards.md` for the full rules), currently hosting one tool, Steam Intersect. Key rules from that doc that shape how code is organized:
 
-`artifacts/stories/` contains planning stories (status, dependencies, acceptance criteria) for upcoming features — not yet implemented:
-- `sa-01-home-page-tool-menu.md` — home page becomes a static menu of available tools
-- `sa-02-intersect-select-friends.md` / `sa-03-intersect-view-common-games.md` — first tool, "Intersect": given a Steam profile, find games owned in common across the user and selected friends via the Steam Web API (server-side API key, in-memory TTL cache for Steam responses)
+- **Tools are independent**: each tool lives under `src/app/<tool>/` and must not reference another tool. Code shared across tools goes in `src/lib/shared/` or `src/components/`.
+- **`"use server"` / `"use client"` never share a file**: Server Functions live in a dedicated file (e.g. `src/lib/steam-intersect/actions.ts`) and are imported into client components, rather than mixing directives in one file.
+- **Shared infrastructure goes through an interface** so implementations can change later — e.g. `Cache` (`src/lib/shared/cache.ts`, currently `InMemoryCache`) is what `SteamApiClient` depends on, not a concrete store.
+- **Zustand for client state**, one store per tool, colocated with it (e.g. `src/app/steam-intersect/store.ts`), combining state and actions in a single `create()` call.
+- **JSDoc on every function and every type/interface/class member.**
 
-Check a story's `Status` field before assuming it's built.
+### Steam Intersect tool (`src/app/steam-intersect/`, `src/lib/steam-intersect/`, `src/lib/shared/steam/`)
+
+Layering, from the API outward:
+
+- `src/lib/shared/steam/client.ts` — `SteamApiClient`: thin wrapper over the Steam Web API (`ResolveVanityURL`, `GetFriendList`, `GetPlayerSummaries`, `GetOwnedGames`). All responses cached for 5 min (`STEAM_CACHE_TTL_MS`) via the injected `Cache`; failures normalize to `SteamApiError` with a machine-readable `SteamErrorCode`.
+- `src/lib/shared/steam/server.ts` — `getSteamClient()`, a `server-only` lazy singleton holding the API key and cache, shared across requests.
+- `src/lib/shared/steam/identity.ts` — parses user input (vanity name, SteamID64, or profile URL) into a typed identity.
+- `src/lib/steam-intersect/lookupProfiles.ts` / `getCommonGames.ts` — tool-specific orchestration over `SteamApiClient`, returning discriminated-union results (`{ ok: true, ... } | { ok: false, error }`) rather than throwing, so callers/UI branch on `error` codes.
+- `src/lib/steam-intersect/actions.ts` — the `"use server"` boundary; thin pass-throughs to the above that client components call directly (React Server Functions, not a REST API).
+- `src/app/steam-intersect/store.ts` — Zustand store driving the selection step (identity input, resolved profiles, selection set, filter).
+- `src/app/steam-intersect/components/` and `results/` — client components consuming the store and calling the Server Functions.
+
+When adding a new tool, mirror this shape: `src/lib/<tool>/` for pure logic (unit-tested), `src/app/<tool>/` for routes/components/store, and put anything reusable across tools in `src/lib/shared/`.
+
+## Testing
+
+- Vitest only; tests live in dot-named sibling directories, not colocated — e.g. `src/lib.tests/steam-intersect/getCommonGames.test.ts` tests `src/lib/steam-intersect/getCommonGames.ts`. `vitest.config.ts` includes `src/**/*.tests/**/*.test.ts`.
+- Per `artifacts/standards.md`, only backend/logic code is unit tested (`lib/`); UI is verified via build/lint/manual checking, not component tests.
+
+## Planning artifacts
+
+`artifacts/stories/` holds planning stories (status, dependencies, acceptance criteria) — check a story's `Status` field before assuming a feature is or isn't built, but don't fully trust it either; verify against the actual code, since stories can go stale after implementation.
 
 ## Important: non-standard Next.js version
 
