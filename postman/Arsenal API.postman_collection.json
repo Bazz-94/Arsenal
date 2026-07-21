@@ -1,0 +1,28 @@
+{
+  "info": {
+    "name": "Arsenal API",
+    "description": "Pages Router API route for external apps (src/pages/api/test.ts).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "description": "Arsenal app base URL"
+    }
+  ],
+  "item": [
+    {
+      "name": "Test",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/test",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "test"]
+        },
+        "description": "Returns a static confirmation message and current timestamp. Used to verify external apps can reach the API."
+      }
+    }
+  ]
+}
