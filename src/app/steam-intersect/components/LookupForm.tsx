@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
-
 /** Props for `LookupForm`. */
 type LookupFormProps = {
+  /** Raw identity text in the form input. */
+  input: string;
+  /** Called with the new input text on every keystroke. */
+  onInputChange: (input: string) => void;
   /** True while the lookup Server Function runs; disables the submit. */
   isPending: boolean;
   /** Called with the entered identity text on submit. */
@@ -12,13 +14,10 @@ type LookupFormProps = {
 
 /**
  * Steam identity form: text input for a vanity name, SteamID64, or
- * profile URL, plus the "Find friends" submit button. Owns the input
- * text; hands it to `onSubmit` when submitted.
+ * profile URL, plus the "Find friends" submit button. Input text is
+ * controlled by the caller so it can persist across navigation.
  */
-export function LookupForm({ isPending, onSubmit }: LookupFormProps) {
-  /** Raw identity text in the form input. */
-  const [input, setInput] = useState("");
-
+export function LookupForm({ input, onInputChange, isPending, onSubmit }: LookupFormProps) {
   /** Submits the entered identity. */
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,7 +29,7 @@ export function LookupForm({ isPending, onSubmit }: LookupFormProps) {
       <input
         type="text"
         value={input}
-        onChange={event => setInput(event.target.value)}
+        onChange={event => onInputChange(event.target.value)}
         placeholder="Vanity name, SteamID64, or profile URL"
         aria-label="Steam profile"
         className="flex-1 rounded-lg border border-card-border bg-card px-4 py-2 outline-none focus:border-foreground/40"

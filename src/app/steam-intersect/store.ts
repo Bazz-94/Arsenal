@@ -9,6 +9,8 @@ export const MIN_SELECTED = 2;
 
 /** State and actions for the Steam Intersect selection step. */
 type IntersectState = {
+  /** Raw identity text in the lookup form input (vanity name, SteamID64, or profile URL). */
+  identityInput: string;
   /** Error code from the last failed lookup, if any. */
   error: LookupErrorCode | null;
   /** Resolved profiles; sorted with filter matches first. */
@@ -19,6 +21,8 @@ type IntersectState = {
   filter: string;
   /** True when the user just tried to select beyond the limit. */
   limitHit: boolean;
+  /** Sets the lookup form input text. */
+  setIdentityInput: (identityInput: string) => void;
   /** Sets the name filter text and sorts matching profiles to the top. */
   setFilter: (filter: string) => void;
   /**
@@ -48,11 +52,14 @@ function sortByFilter(
 
 /** Zustand store backing the Steam Intersect selection step. */
 export const useIntersectStore = create<IntersectState>(set => ({
+  identityInput: "",
   error: null,
   profiles: null,
   selected: new Set<string>(),
   filter: "",
   limitHit: false,
+
+  setIdentityInput: identityInput => set({ identityInput }),
 
   setFilter: filter =>
     set(state => ({

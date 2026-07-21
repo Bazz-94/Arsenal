@@ -38,7 +38,7 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
         {ids.length < MIN_SELECTED ? (
           <SelectionRequiredNotice />
         ) : (
-          <Results ids={ids} />
+          <Group ids={ids} />
         )}
       </div>
     </main>
@@ -54,8 +54,8 @@ function SelectionRequiredNotice() {
   );
 }
 
-/** Fetches the initial common-games lookup for `ids` and hands off to `ResultsView`. */
-async function Results({ ids }: { ids: string[] }) {
+/** Resolves the group and its common games for `ids` and hands off to `ResultsView`. */
+async function Group({ ids }: { ids: string[] }) {
   const result = await getCommonGames(getSteamClient(), ids);
 
   if (!result.ok) {

@@ -17,11 +17,13 @@ export default function IntersectTool() {
   const router = useRouter();
   /** Selection-step state and actions from the Zustand store. */
   const {
+    identityInput,
     error,
     profiles,
     selected,
     filter,
     limitHit,
+    setIdentityInput,
     setFilter,
     applyLookup,
     toggle,
@@ -44,7 +46,12 @@ export default function IntersectTool() {
 
   return (
     <div className="w-full max-w-4xl">
-      <LookupForm isPending={isPending} onSubmit={handleSubmit} />
+      <LookupForm
+        input={identityInput}
+        onInputChange={setIdentityInput}
+        isPending={isPending}
+        onSubmit={handleSubmit}
+      />
 
       {error && (
         <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-400">
@@ -73,7 +80,7 @@ export default function IntersectTool() {
               disabled={selected.size < MIN_SELECTED}
               className="rounded-lg border border-card-border bg-card px-5 py-2 font-medium transition-colors hover:border-foreground/30 disabled:opacity-50"
             >
-              View common games
+              Create group
             </button>
           </div>
           {limitHit && (
