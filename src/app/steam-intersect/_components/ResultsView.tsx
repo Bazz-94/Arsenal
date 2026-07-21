@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useTransition } from "react";
-import { ProfileCard } from "../_components/ProfileCard";
+import { useEffect, useTransition } from "react";
+import { ProfileCard } from "./ProfileCard";
 import { recomputeCommonGames } from "@/src/app/steam-intersect/_lib/actions";
-import { MIN_SELECTED } from "../store";
+import { MIN_SELECTED, useIntersectStore } from "../store";
 import type { SteamGame, SteamProfile } from "@/src/app/_lib/steam/types";
 import type { ExcludedProfile } from "@/src/app/steam-intersect/_lib/getCommonGames";
 
@@ -30,25 +30,32 @@ export function ResultsView({ initialProfiles, initialGames, excluded: initialEx
   const sortedProfiles = [...initialProfiles].sort((a, b) =>
     a.name.localeCompare(b.name)
   );
-  /** SteamID64s currently included in the comparison. */
-  const [selected, setSelected] = useState(
-    () => new Set(initialProfiles.map(profile => profile.steamId))
-  );
-  /** Common games for the last computed `selected` set. */
-  const [games, setGames] = useState<SteamGame[]>(initialGames);
-  /** Profiles left out of the last computation. */
-  const [excluded, setExcluded] = useState<ExcludedProfile[]>(initialExcluded);
-  /** Ids `games` was last computed for. Used to detect when the selection
-   * has changed since, so the button re-enables. */
-  const [computedFor, setComputedFor] = useState(
-    () => new Set(initialProfiles.map(profile => profile.steamId))
-  );
-  /** True when the user just tried to drop below `MIN_SELECTED`. */
-  const [limitHit, setLimitHit] = useState(false);
-  /** True when the last computation failed to resolve any profile. */
-  const [recomputeFailed, setRecomputeFailed] = useState(false);
+  /** Results-step state and actions from the Zustand store. */
+  const {
+    resultsSelected: selected,
+    resultsGames: games,
+    resultsExcluded: excluded,
+    resultsComputedFor: computedFor,
+    resultsLimitHit: limitHit,
+    resultsRecomputeFailed: recomputeFailed,
+    initResults,
+    toggleResult,
+    applyRecompute,
+  } = useIntersectStore();
   /** Pending state while a compute Server Function call is in flight. */
   const [isPending, startTransition] = useTransition();
+
+  /** Ids identifying the initial group, so the store re-seeds if the URL's `ids` change. */
+  const initialKey = initialProfiles
+    .map(profile => profile.steamId)
+    .sort()
+    .join(",");
+
+  /** Seeds the store from the group initially resolved server-side. */
+  useEffect(() => {
+    initResults(initialProfiles, initialGames, initialExcluded);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialKey]);
 
   /** True when `games` doesn't reflect the current `selected` set. */
   const isStale =
@@ -58,28 +65,8 @@ export function ResultsView({ initialProfiles, initialGames, excluded: initialEx
   function computeGames() {
     const steamIds = [...selected];
     startTransition(async () => {
-      const result = await recomputeCommonGames(steamIds);
-      setRecomputeFailed(!result.ok);
-      setGames(result.ok ? result.games : []);
-      setExcluded(result.excluded);
-      setComputedFor(new Set(steamIds));
+      applyRecompute(steamIds, await recomputeCommonGames(steamIds));
     });
-  }
-
-  /** Toggles one profile in or out, enforcing `MIN_SELECTED`. */
-  function toggle(steamId: string) {
-    const next = new Set(selected);
-    if (next.has(steamId)) {
-      if (next.size <= MIN_SELECTED) {
-        setLimitHit(true);
-        return;
-      }
-      next.delete(steamId);
-    } else {
-      next.add(steamId);
-    }
-    setLimitHit(false);
-    setSelected(next);
   }
 
   return (
@@ -108,7 +95,7 @@ export function ResultsView({ initialProfiles, initialGames, excluded: initialEx
             profile={profile}
             isSelf={profile.steamId === selfId}
             isSelected={selected.has(profile.steamId)}
-            onToggle={toggle}
+            onToggle={toggleResult}
           />
         ))}
       </ul>

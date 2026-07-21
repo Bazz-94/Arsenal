@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getSteamClient } from "@/src/app/_lib/steam/server";
 import { getCommonGames } from "@/src/app/steam-intersect/_lib/getCommonGames";
 import { MIN_SELECTED } from "../store";
-import { ResultsView } from "./ResultsView";
+import { ResultsView } from "../_components/ResultsView";
 
 /** Page metadata for the Steam Intersect results view. */
 export const metadata: Metadata = {

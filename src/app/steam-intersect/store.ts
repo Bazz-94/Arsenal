@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import type { Profile } from "@/src/app/steam-intersect/_lib/types";
 import type { LookupErrorCode, LookupProfilesResult } from "@/src/app/steam-intersect/_lib/lookupProfiles";
+import type { CommonGamesResult, ExcludedProfile } from "@/src/app/steam-intersect/_lib/getCommonGames";
+import type { SteamGame, SteamProfile } from "@/src/app/_lib/steam/types";
 
 /** Max people (including self) that can be included in the intersection. */
 export const MAX_SELECTED = 10;
@@ -33,6 +35,26 @@ type IntersectState = {
   applyLookup: (result: LookupProfilesResult) => void;
   /** Toggles one profile's selection, enforcing the cap with feedback. */
   toggle: (steamId: string) => void;
+
+  /** SteamID64s currently included in the results comparison. */
+  resultsSelected: Set<string>;
+  /** Common games for the last computed `resultsSelected` set. */
+  resultsGames: SteamGame[];
+  /** Profiles left out of the last computation. */
+  resultsExcluded: ExcludedProfile[];
+  /** Ids `resultsGames` was last computed for. Used to detect when the
+   * selection has changed since, so the recompute button re-enables. */
+  resultsComputedFor: Set<string>;
+  /** True when the user just tried to drop the results selection below `MIN_SELECTED`. */
+  resultsLimitHit: boolean;
+  /** True when the last recompute failed to resolve any profile. */
+  resultsRecomputeFailed: boolean;
+  /** Seeds the results view from the group initially resolved server-side. */
+  initResults: (profiles: SteamProfile[], games: SteamGame[], excluded: ExcludedProfile[]) => void;
+  /** Toggles one profile in or out of the results comparison, enforcing `MIN_SELECTED`. */
+  toggleResult: (steamId: string) => void;
+  /** Applies a recompute result for `steamIds`: updates games/excluded and marks them current, or flags failure. */
+  applyRecompute: (steamIds: string[], result: CommonGamesResult) => void;
 };
 
 /**
@@ -94,5 +116,46 @@ export const useIntersectStore = create<IntersectState>(set => ({
         next.add(steamId);
       }
       return { selected: next, limitHit: false };
+    }),
+
+  resultsSelected: new Set<string>(),
+  resultsGames: [],
+  resultsExcluded: [],
+  resultsComputedFor: new Set<string>(),
+  resultsLimitHit: false,
+  resultsRecomputeFailed: false,
+
+  initResults: (profiles, games, excluded) => {
+    const ids = new Set(profiles.map(profile => profile.steamId));
+    set({
+      resultsSelected: ids,
+      resultsGames: games,
+      resultsExcluded: excluded,
+      resultsComputedFor: ids,
+      resultsLimitHit: false,
+      resultsRecomputeFailed: false,
+    });
+  },
+
+  toggleResult: steamId =>
+    set(state => {
+      const next = new Set(state.resultsSelected);
+      if (next.has(steamId)) {
+        if (next.size <= MIN_SELECTED) {
+          return { resultsLimitHit: true };
+        }
+        next.delete(steamId);
+      } else {
+        next.add(steamId);
+      }
+      return { resultsSelected: next, resultsLimitHit: false };
+    }),
+
+  applyRecompute: (steamIds, result) =>
+    set({
+      resultsRecomputeFailed: !result.ok,
+      resultsGames: result.ok ? result.games : [],
+      resultsExcluded: result.excluded,
+      resultsComputedFor: new Set(steamIds),
     }),
 }));
