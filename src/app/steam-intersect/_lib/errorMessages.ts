@@ -1,4 +1,4 @@
-import type { LookupErrorCode } from "@/src/lib/steam-intersect/lookupProfiles";
+import type { LookupErrorCode } from "@/src/app/steam-intersect/_lib/lookupProfiles";
 
 /** User-facing message per lookup error code. */
 export const ERROR_MESSAGES: Record<LookupErrorCode, string> = {

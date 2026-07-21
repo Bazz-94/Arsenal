@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatOfflineDuration } from "../../../lib/shared/steam/types";
+import { formatOfflineDuration } from "@/src/app/_lib/steam/types";
 
 describe("formatOfflineDuration", () => {
   const now = 1_700_100_000_000;

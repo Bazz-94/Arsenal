@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isSteamId64, parseSteamIdentity } from "../../../lib/shared/steam/identity";
+import { isSteamId64, parseSteamIdentity } from "@/src/app/_lib/steam/identity";
 
 describe("isSteamId64", () => {
   it("accepts a 17-digit id", () => {

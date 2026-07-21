@@ -2,10 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { lookupSteamProfiles } from "../../../lib/steam-intersect/actions";
+import { lookupSteamProfiles } from "@/src/app/steam-intersect/_lib/actions";
 import { LookupForm } from "./LookupForm";
 import { ProfileCard } from "./ProfileCard";
-import { ERROR_MESSAGES } from "../../../lib/steam-intersect/errorMessages";
+import { ERROR_MESSAGES } from "@/src/app/steam-intersect/_lib/errorMessages";
 import { MAX_SELECTED, MIN_SELECTED, useIntersectStore } from "../store";
 
 /**

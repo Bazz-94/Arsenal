@@ -1,6 +1,6 @@
-import { parseSteamIdentity } from "../shared/steam/identity";
-import { SteamApiError, type SteamErrorCode } from "../shared/steam/types";
-import type { SteamApiClient } from "../shared/steam/client";
+import { parseSteamIdentity } from "@/src/app/_lib/steam/identity";
+import { SteamApiError, type SteamErrorCode } from "@/src/app/_lib/steam/types";
+import type { SteamApiClient } from "@/src/app/_lib/steam/client";
 import type { Profile } from "./types";
 
 /** Failure categories for a profiles lookup, including bad user input. */

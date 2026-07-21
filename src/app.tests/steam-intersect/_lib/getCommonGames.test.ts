@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { getCommonGames } from "../../lib/steam-intersect/getCommonGames";
-import type { Profile } from "../../lib/steam-intersect/types";
-import type { SteamApiClient } from "../../lib/shared/steam/client";
-import { SteamApiError, type SteamGame } from "../../lib/shared/steam/types";
+import { getCommonGames } from "@/src/app/steam-intersect/_lib/getCommonGames";
+import type { Profile } from "@/src/app/steam-intersect/_lib/types";
+import type { SteamApiClient } from "@/src/app/_lib/steam/client";
+import { SteamApiError, type SteamGame } from "@/src/app/_lib/steam/types";
 
 /** Builds a `Profile` with sensible defaults. */
 function profile(steamId: string, overrides: Partial<Profile> = {}): Profile {

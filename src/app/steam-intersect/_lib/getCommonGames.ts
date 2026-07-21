@@ -1,5 +1,5 @@
-import type { SteamApiClient } from "../shared/steam/client";
-import { SteamApiError, type SteamGame, type SteamProfile } from "../shared/steam/types";
+import type { SteamApiClient } from "@/src/app/_lib/steam/client";
+import { SteamApiError, type SteamGame, type SteamProfile } from "@/src/app/_lib/steam/types";
 
 /** Why a profile was left out of the intersection. */
 export type ExclusionReason = "private" | "unavailable";

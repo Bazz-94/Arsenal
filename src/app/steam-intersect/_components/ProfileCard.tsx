@@ -6,7 +6,7 @@ import {
   PERSONA_STATE_COLORS,
   PERSONA_STATE_LABELS,
   type SteamProfile,
-} from "@/src/lib/shared/steam/types";
+} from "@/src/app/_lib/steam/types";
 
 /** Props for `ProfileCard`. */
 type ProfileCardProps = {

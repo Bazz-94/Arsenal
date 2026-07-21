@@ -1,4 +1,4 @@
-import type { SteamProfile } from "../shared/steam/types";
+import type { SteamProfile } from "@/src/app/_lib/steam/types";
 
 /**
  * A Steam profile as used within the Steam Intersect tool, distinguishing

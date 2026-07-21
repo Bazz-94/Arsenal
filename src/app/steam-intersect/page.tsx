@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import IntersectTool from "./components/IntersectTool";
+import IntersectTool from "./_components/IntersectTool";
 
 /** Page metadata for the Steam Intersect tool. */
 export const metadata: Metadata = {

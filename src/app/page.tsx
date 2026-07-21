@@ -1,4 +1,4 @@
-import ToolCard, { type Tool } from "@/src/components/ToolCard";
+import ToolCard, { type Tool } from "@/src/app/_components/ToolCard";
 
 /** All tools available on the site, rendered as menu cards. */
 const tools: Tool[] = [

@@ -1,8 +1,8 @@
 "use server";
 
-import { getSteamClient } from "@/src/lib/shared/steam/server";
-import { lookupProfiles, type LookupProfilesResult } from "@/src/lib/steam-intersect/lookupProfiles";
-import { getCommonGames, type CommonGamesResult } from "@/src/lib/steam-intersect/getCommonGames";
+import { getSteamClient } from "@/src/app/_lib/steam/server";
+import { lookupProfiles, type LookupProfilesResult } from "@/src/app/steam-intersect/_lib/lookupProfiles";
+import { getCommonGames, type CommonGamesResult } from "@/src/app/steam-intersect/_lib/getCommonGames";
 
 /**
  * Server Function: resolves the entered Steam identity (vanity name,

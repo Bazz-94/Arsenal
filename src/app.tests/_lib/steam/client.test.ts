@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
-import { InMemoryCache } from "../../../lib/shared/cache";
+import { InMemoryCache } from "@/src/app/_lib/cache";
 import {
   PLAYER_SUMMARIES_BATCH_SIZE,
   SteamApiClient,
   mapPlayerToProfile,
-} from "../../../lib/shared/steam/client";
-import { SteamApiError } from "../../../lib/shared/steam/types";
+} from "@/src/app/_lib/steam/client";
+import { SteamApiError } from "@/src/app/_lib/steam/types";
 
 /** Builds a JSON `Response` with the given body and status. */
 function jsonResponse(body: unknown, status = 200): Response {

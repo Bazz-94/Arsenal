@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import type { Profile } from "@/src/lib/steam-intersect/types";
-import type { LookupErrorCode, LookupProfilesResult } from "@/src/lib/steam-intersect/lookupProfiles";
+import type { Profile } from "@/src/app/steam-intersect/_lib/types";
+import type { LookupErrorCode, LookupProfilesResult } from "@/src/app/steam-intersect/_lib/lookupProfiles";
 
 /** Max people (including self) that can be included in the intersection. */
 export const MAX_SELECTED = 10;

@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import { useState, useTransition } from "react";
-import { ProfileCard } from "../components/ProfileCard";
-import { recomputeCommonGames } from "@/src/lib/steam-intersect/actions";
+import { ProfileCard } from "../_components/ProfileCard";
+import { recomputeCommonGames } from "@/src/app/steam-intersect/_lib/actions";
 import { MIN_SELECTED } from "../store";
-import type { SteamGame, SteamProfile } from "@/src/lib/shared/steam/types";
-import type { ExcludedProfile } from "@/src/lib/steam-intersect/getCommonGames";
+import type { SteamGame, SteamProfile } from "@/src/app/_lib/steam/types";
+import type { ExcludedProfile } from "@/src/app/steam-intersect/_lib/getCommonGames";
 
 /** Props for `ResultsView`. */
 type ResultsViewProps = {

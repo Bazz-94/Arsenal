@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { lookupProfiles } from "../../lib/steam-intersect/lookupProfiles";
-import { SteamApiError } from "../../lib/shared/steam/types";
-import type { Profile } from "../../lib/steam-intersect/types";
-import type { SteamApiClient } from "../../lib/shared/steam/client";
+import { lookupProfiles } from "@/src/app/steam-intersect/_lib/lookupProfiles";
+import { SteamApiError } from "@/src/app/_lib/steam/types";
+import type { Profile } from "@/src/app/steam-intersect/_lib/types";
+import type { SteamApiClient } from "@/src/app/_lib/steam/client";
 
 /** Builds a `Profile` with sensible defaults. */
 function profile(steamId: string, overrides: Partial<Profile> = {}): Profile {
