@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useTransition } from "react";
 import { ProfileCard } from "./ProfileCard";
+import { BackLink } from "./BackLink";
 import { recomputeCommonGames } from "@/src/app/steam-intersect/_lib/actions";
 import { MIN_SELECTED, useIntersectStore } from "../store";
 import type { SteamGame, SteamProfile } from "@/src/app/_lib/steam/types";
@@ -78,15 +79,10 @@ export function ResultsView({ initialProfiles, initialGames, excluded: initialEx
       )}
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-foreground/70">Group</h2>
-        <button
-          type="button"
-          onClick={computeGames}
-          disabled={isPending || !isStale}
-          className="rounded-lg border border-card-border bg-card px-5 py-2 font-medium transition-colors hover:border-foreground/30 disabled:opacity-50"
-        >
-          {isPending ? "Loading…" : "View common games"}
-        </button>
+        <h2 className="text-sm text-foreground/70">
+          {selected.size} / {sortedProfiles.length} selected in group
+        </h2>
+        <BackLink />
       </div>
       <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {sortedProfiles.map(profile => (
@@ -105,7 +101,17 @@ export function ResultsView({ initialProfiles, initialGames, excluded: initialEx
         </p>
       )}
 
-      <h2 className="mt-8 text-foreground/70">Games in Common</h2>
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-sm text-foreground/70">{games.length} games in common</h2>
+        <button
+          type="button"
+          onClick={computeGames}
+          disabled={isPending || !isStale}
+          className="rounded-lg border border-card-border bg-card px-5 py-2 font-medium transition-colors hover:border-foreground/30 disabled:opacity-50"
+        >
+          {isPending ? "Loading…" : "Update"}
+        </button>
+      </div>
       {recomputeFailed ? (
         <p role="alert" className="mt-4 text-sm text-red-600 dark:text-red-400">
           Couldn&apos;t update the list. Try again.

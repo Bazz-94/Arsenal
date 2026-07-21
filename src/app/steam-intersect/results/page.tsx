@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getSteamClient } from "@/src/app/_lib/steam/server";
 import { getCommonGames } from "@/src/app/steam-intersect/_lib/getCommonGames";
 import { MIN_SELECTED } from "../store";
+import { BackLink } from "../_components/BackLink";
 import { ResultsView } from "../_components/ResultsView";
 
 /** Page metadata for the Steam Intersect results view. */
@@ -29,28 +29,25 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
   const ids = parseIds((await searchParams).ids);
 
   return (
-    <main className="flex flex-col flex-1 items-center px-4 py-16">
-      <div className="w-full max-w-4xl">
-        <Link href="/steam-intersect" className="text-sm text-foreground/70 underline">
-          Back to selection
-        </Link>
-        <h1 className="mt-2 text-3xl font-semibold">Common Games</h1>
-        {ids.length < MIN_SELECTED ? (
-          <SelectionRequiredNotice />
-        ) : (
-          <Group ids={ids} />
-        )}
-      </div>
-    </main>
+    <div className="mt-8">
+      {ids.length < MIN_SELECTED ? (
+        <SelectionRequiredNotice />
+      ) : (
+        <Group ids={ids} />
+      )}
+    </div>
   );
 }
 
 /** Shown when the URL doesn't carry a valid selection to compare. */
 function SelectionRequiredNotice() {
   return (
-    <p className="mt-4 text-foreground/70">
-      Select at least {MIN_SELECTED} people to compare.
-    </p>
+    <>
+      <BackLink />
+      <p className="mt-4 text-foreground/70">
+        Select at least {MIN_SELECTED} people to compare.
+      </p>
+    </>
   );
 }
 
@@ -60,10 +57,13 @@ async function Group({ ids }: { ids: string[] }) {
 
   if (!result.ok) {
     return (
-      <p role="alert" className="mt-4 text-sm text-red-600 dark:text-red-400">
-        None of the selected profiles could be read. Try again, or go back
-        and pick different people.
-      </p>
+      <>
+        <BackLink />
+        <p role="alert" className="mt-4 text-sm text-red-600 dark:text-red-400">
+          None of the selected profiles could be read. Try again, or go back
+          and pick different people.
+        </p>
+      </>
     );
   }
 

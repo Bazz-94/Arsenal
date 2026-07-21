@@ -39,7 +39,7 @@ export function LookupForm({ input, onInputChange, isPending, onSubmit }: Lookup
         disabled={isPending || input.trim() === ""}
         className="rounded-lg border border-card-border bg-card px-5 py-2 font-medium transition-colors hover:border-foreground/30 disabled:opacity-50"
       >
-        {isPending ? "Looking up…" : "Find friends"}
+        {isPending ? "Finding…" : "Find friends"}
       </button>
     </form>
   );

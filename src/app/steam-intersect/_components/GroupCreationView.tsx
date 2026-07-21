@@ -13,7 +13,7 @@ import { MAX_SELECTED, MIN_SELECTED, useIntersectStore } from "../store";
  * people (self included) from the resolved friend list. Proceeds to the
  * results page with the selected SteamID64s.
  */
-export default function IntersectTool() {
+export default function GroupCreationView() {
   const router = useRouter();
   /** Selection-step state and actions from the Zustand store. */
   const {
