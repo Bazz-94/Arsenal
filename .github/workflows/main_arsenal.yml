@@ -50,24 +50,6 @@ jobs:
         with:
           name: node-app
 
-      - name: Set Azure Web App settings
-        uses: azure/appservice-settings@v1
-        with:
-          app-name: 'Arsenal'
-          slot-name: 'Production'
-          app-settings-json: |
-            [
-              {
-                "name": "STEAM_API_KEY",
-                "value": "${{ secrets.STEAM_API_KEY }}",
-                "slotSetting": false
-              }
-            ]
-
-      - name: Set startup command
-        run: |
-          az webapp config set --name Arsenal --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --startup-file "node server.js"
-
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -76,3 +58,12 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8C87D2D2797B4B1283728FC6C4B21885 }}
+
+          app-settings-json: |
+            [
+              {
+                "name": "STEAM_API_KEY",
+                "value": "${{ secrets.STEAM_API_KEY }}",
+                "slotSetting": false
+              }
+            ]
