@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 /** Project Next.js configuration. */
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  distDir: 'build',
   output: "standalone",
   images: {
     // Steam serves avatars from these hosts (GetPlayerSummaries avatarfull).
