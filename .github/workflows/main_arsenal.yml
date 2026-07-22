@@ -50,11 +50,6 @@ jobs:
         with:
           name: node-app
 
-      - name: Azure login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       - name: Set Azure Web App settings
         uses: azure/appservice-settings@v1
         with:
