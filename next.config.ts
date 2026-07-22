@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 /** Project Next.js configuration. */
 const nextConfig: NextConfig = {
+  output: "standalone",
   images: {
     // Steam serves avatars from these hosts (GetPlayerSummaries avatarfull).
     remotePatterns: [
