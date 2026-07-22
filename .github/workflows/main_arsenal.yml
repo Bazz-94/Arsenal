@@ -24,8 +24,6 @@ jobs:
           node-version: '22.x'
 
       - name: npm install, build, and test
-        env:
-          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
         run: |
           npm install
           npm run build --if-present
@@ -63,3 +61,12 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8C87D2D2797B4B1283728FC6C4B21885 }}
+
+          app-settings-json: |
+            [
+              {
+                "name": "STEAM_API_KEY",
+                "value": "${{ secrets.STEAM_API_KEY }}",
+                "slotSetting": false
+              }
+            ]
